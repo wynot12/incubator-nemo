@@ -1,3 +1,3 @@
 # Apache Nemo
 
-Welcome to Apache Nemo~!
+Welcome to Apache Nemo!
