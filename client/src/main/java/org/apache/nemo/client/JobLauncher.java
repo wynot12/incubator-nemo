@@ -175,9 +175,9 @@ public final class JobLauncher {
     jobDoneLatch = new CountDownLatch(1);
     isSetUp = true;
     driverLauncher = DriverLauncher.getLauncher(deployModeConf);
-    driverLauncher.submit(jobAndDriverConf, 500);
+    driverLauncher.submit(jobAndDriverConf, 0);
 
-    final LauncherStatus status = driverLauncher.waitForStatus(100000, LauncherStatus.RUNNING);
+    final LauncherStatus status = driverLauncher.waitForStatus(0, LauncherStatus.RUNNING);
     if (!status.isRunning()) {
       throw new RuntimeException("Driver setup failed. " + status.toString());
     }
