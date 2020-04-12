@@ -34,6 +34,7 @@ import org.apache.nemo.runtime.common.plan.PlanRewriter;
 import org.apache.nemo.runtime.master.scheduler.Scheduler;
 import org.apache.reef.client.DriverConfiguration;
 import org.apache.reef.client.DriverLauncher;
+import org.apache.reef.client.LauncherStatus;
 import org.apache.reef.client.parameters.JobMessageHandler;
 import org.apache.reef.io.network.naming.LocalNameResolverConfiguration;
 import org.apache.reef.io.network.naming.NameServerConfiguration;
@@ -175,7 +176,11 @@ public final class JobLauncher {
     isSetUp = true;
     driverLauncher = DriverLauncher.getLauncher(deployModeConf);
     driverLauncher.submit(jobAndDriverConf, 500);
-    // When the driver is up and the resource is ready, the DriverReady message is delivered.
+
+    final LauncherStatus status = driverLauncher.waitForStatus(100000, LauncherStatus.RUNNING);
+    if (!status.isRunning()) {
+      throw new RuntimeException("Driver setup failed. " + status.toString());
+    }
   }
 
   /**
@@ -278,6 +283,7 @@ public final class JobLauncher {
     // Wait until the driver is ready.
     try {
       LOG.info("Waiting for the driver to be ready");
+      // When the driver is up and the resource is ready, the DriverReady message is delivered.
       driverReadyLatch.await();
     } catch (final InterruptedException e) {
       LOG.warn(INTERRUPTED, e);
